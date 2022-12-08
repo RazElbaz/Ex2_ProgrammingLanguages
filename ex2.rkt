@@ -190,6 +190,7 @@ estimator).
 Input:  PLANG
 Output: List of Numbers
 Problems we encountered : We had problems with the evaluation process, we had to repeat the lectures and exercises again to understand in depth. We had to think about how to go through the variables and then we remembered the "map" function that we used in previous sections and we used it.
+One of the ways to deal with the evaluation was to write down for ourselves the way to calculate in front of our eyes (we presented it in a note) and thus we were able to create many tests.
 Time: 3 hours
 |#
 ;; evaluates AE expressions to numbers
@@ -203,8 +204,8 @@ Time: 3 hours
     [(Mul l r) (* (eval l) (eval r))]
     [(Div l r) (/ (eval l) (eval r))]))
 
-#| The eval-poly function converts a PLANG to a list of numbers and evaluates them. In addition, the function uses the "eval" function
-   and the createPolynomial function from question 3.1. |#
+#| The eval-poly function converts a PLANG to a list of numbers and evaluates them.
+   Additionally, the function uses the createPolynomial function from question 3.1 because we needed to create a polynomial. |#
 (: eval-poly : PLANG -> (Listof Number))
 (define (eval-poly p-expr)
  (cases p-expr
@@ -217,3 +218,51 @@ Converts the string to PLANG using a parse function and returns a Listof number 
 ;; evaluate a FLANG program contained in a string
 (define (run str)
 (eval-poly (parse str)))
+
+#|
+Explanation of the calculation:
+{{poly x1 x2 x3}{y1 y2 y3}}=>'(x1*y1^0+x2*y1^1+x3*y1^2  x1*y2^0+x2*y2^1+x3*y2^2  x1*y3^0+x2*y3^1+x3*y3^2)
+|#
+(test (run "{{poly 1 2 3} {1 2 3}}")  => '(6 17 34))
+(test (run "{{poly 4 2 7} {1 4 9}}")  => '(13 124 589)) 
+(test (run "{{poly 1 2 3} {1 2 3}}")   => '(6 17 34)) 
+(test (run "{{poly 4/5 } {1/2 2/3 3}}")  => '(4/5 4/5 4/5)) 
+(test (run "{{poly 2 3} {4}}")  => '(14)) 
+(test (run "{{poly 1 1 0} {-1 3 3}}")  => '(0 4 4))  
+(test (run "{{poly {/ 4 2} {- 4 1}} {{- 8 4}}}") => '(14)) 
+(test (run "{{poly {+ 0 1} 1 {* 0 9}} {{- 4 5} 3 {/ 27 9}}}") => '(0 4 4))
+(test (run "{{poly 10 10} {1}}") => '(20))
+(test (run "{{poly 0} {1}}")=> '(0))
+
+ ;;negative
+(test (run "{{poly -1} {-1}}") => '(-1))
+(test (run "{{poly -1 -1 -1 -1} {-1 -1 -1 -1}}") => '(0 0 0 0))
+(test (run "{{poly -1  -1 -1} { -1 -1 -1}}") => '(-1 -1 -1))
+(test (run "{{poly -11 -22 -33} {1 2 3}}") => '(-66 -187 -374))
+
+
+ ;;fraction
+(test (run "{{poly 1/2} {1 1 1}}") => '(1/2 1/2 1/2))
+(test (run "{{poly 1} {1/2 1/2 1/2}}") => '(1 1 1))
+(test (run "{{poly 1/2} {1/2 1/2 1/2}}") => '(1/2 1/2 1/2))
+(test (run "{{poly 1 0} {-1 6 3}}")=> '(1 1 1))
+
+;;big numbers
+(test (run "{{poly 111 222 333} {1 2 3}}")=> '(666 1887 3774))
+(test (run "{{poly 100 100 100} {1 2 3}}")=> '(300 700 1300))
+(test (run "{{poly 10 10 10} {10 20 30}}")=> '(1110 4210 9310))
+(test (run "{{poly 123 123 123} {1 2 3}}")=> '(369 861 1599))
+(test (run "{{poly 100 100 100} {100 200 300}}")=> '(1010100 4020100 9030100))
+
+ ;;arithmetic
+(test (run "{{poly {+ 10 10} 10 {* 10 9}} {4 3 {/ 27 9}}}")=> '(1500 860 860))
+(test (run "{{poly {+ 10 10} 10 {* 10 9}} {{+ 2 2} 3 {/ 27 9}}}")=> '(1500 860 860))
+(test (run "{{poly 1/2 } {{+ 1/2 1/2} 1/2 {/ 1/2 1/2}}}")=> '(1/2 1/2 1/2))
+
+;;errors
+;;We added error tests because we wanted to check if the "run" function would return a "parse" function error like it should
+(test (run "{{poly } {1 2} }") =error> "parse: at least one coefficient is required in ((poly) (1 2))") 
+(test (run "{{poly 1 2} {} }") =error> "parse: at least one point is required in ((poly 1 2) ())")
+(test (run "{{poly } {}}")=error> "parse: at least one coefficient is required in ((poly) ())")
+(test (run "{poly Gal Raz 100}") =error> "parse: bad syntax in (poly Gal Raz 100)")
+(test (run "{poly}") =error> "parse: bad syntax in (poly)")
