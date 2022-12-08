@@ -1,6 +1,25 @@
 #lang pl
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #|
+Task 1.a:
+In class we saw the grammar of AE - a simple language for "arithmetic expressions".
+We were asked to write a BNF for "SE": a similar simple language of "string expressions". Legal 'programs' (ie, SE language words) should follow the lines of pl-expressions for strings, with two exceptions:
+ 1. Only digits 0,...,9 are allowed as legal characters within strings;
+ 2. We will have two types of expressions that are not available in the pl language (see below expressions of type 'stringinsert' and 'number->string'). The valid operators that can be used in these expressions are string, string-length and string-append, as well as string-insert and number->string.
+It is also legal to accept expressions of the form "<D>", where <D> represents a (finite) sequence of digits. Simple values in the language are characters (of digits) and natural numbers, so the following expressions are also valid expressions: a sequence of digits
+(eg, 347226) and an expression of the form #\v, where v is a digit.
+
+We used λ to denote the empty string.
+Time: 
+|#
+
+#|
+
+
+
+|#
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#|
 Task 2:
 We used the instructions in foldl along with map to define a sum of squares function that takes a list of numbers as input,
 and produces a number that is the sum of the squares of all the numbers in the list.
