@@ -189,8 +189,8 @@ In this task we were asked to write the evaluation process. In order to leave th
 estimator).
 Input:  PLANG
 Output: List of Numbers
-Problems we encountered :We had difficulty understanding in what order to put the variables, how to arrange everything in the template and how to calculate the polynomial rules.
-Time: 70 minutes
+Problems we encountered : We had problems with the evaluation process, we had to repeat the lectures and exercises again to understand in depth. We had to think about how to go through the variables and then we remembered the "map" function that we used in previous sections and we used it.
+Time: 3 hours
 |#
 ;; evaluates AE expressions to numbers
 (: eval : AE -> Number)
@@ -208,8 +208,11 @@ Time: 70 minutes
 (: eval-poly : PLANG -> (Listof Number))
 (define (eval-poly p-expr)
  (cases p-expr
-   [(Poly lhs rhs) (map (createPolynomial (map eval lhs)) (map eval rhs))]))
+   [(Poly lhs rhs) (map (createPolynomial (map eval lhs)) (map eval rhs))])) ;;We used the "map" function to iterate through all the items in the lists.
 
+#| This function takes a string,
+Converts the string to PLANG using a parse function and returns a Listof number generated using the eve-poly function
+|#
 (: run : String -> (Listof Number))
 ;; evaluate a FLANG program contained in a string
 (define (run str)
