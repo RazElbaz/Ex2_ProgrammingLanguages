@@ -1,4 +1,4 @@
-#lang pl
+#lang pl 02
 ;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #|
 Task 1.a:
@@ -10,11 +10,78 @@ It is also legal to accept expressions of the form "<D>", where <D> represents a
 (eg, 347226) and an expression of the form #\v, where v is a digit.
 
 We used λ to denote the empty string.
-Time: 
+Problems we encountered: We had difficulty understanding how to define the SE, we had difficulty defining the STRING according to the examples.
+Time: 5 hours
+
+
+ BNF for “SE”:
+ 
+ <SE> ::=  <CHARS> | <NUM> | <STRING> 
+ <NUM> ::= <DIGIT> | <DIGIT> <NUM>  | {string-length <STRING>}    ;;Taken from the lecture
+ <DIGIT> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9                ;;Taken from the lecture
+ <CHARS> ::= #\<DIGIT> | #\<DIGIT> <CHARS> 
+
+
+ <STRING> ::=
+         <NUM>
+         | " <NUM>"  ;;;;;;check;;;;;
+         | λ ;;;;;;check;;;;;
+         | {string-append  λ  λ}  ;;;;;;check;;;;;
+         | STRING ;;;;;;check;;;;;
+         | {string <CHARS>}                       ;; ( string #\1 #\2 #\4 ) 
+         | {string-append <STRING>}               ;; (string-append "45")
+         | {string-append <STRING> <STRING>}      ;; (string-append ( string #\1 #\2 #\4 ) "12" ) 
+         | {string-append <STRING> <CHARS>}       ;; (string-append "45"  #\4 #\5)
+         | {string-insert <STRING> <CHARS> <NUM>} ;; ( string-insert "1357" #\4 66 ) 
+         | {number->string <NUM>}                 ;;( number->string ( string-length "0033344" ) ) 
+         
+         
+           
+
 |#
-
+;;--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #|
+Task 1.b:
+We were asked to present a derivation process for 3 different SE expressions, so that each operator (eg, string-append, string-length and
+number->string) appears in at least one of these expressions.
 
+We used λ to denote the empty string.
+Problems we encountered: We had difficulty understanding how to define the SE, we had difficulty defining the STRING according to the examples.
+Time: 4 hours
+
+1)(string #\1 #\2 #\3)
+
+
+                                                                      
+<SE> =>
+        <STRING> =>
+                   => {string <CHARS>}
+                   => {string  #\<DIGIT> <CHARS> }
+                   => {string  #\1 #\<DIGIT> <CHARS> }
+                   => {string  #\1 #\2 #\<DIGIT>}
+                   => {string  #\1 #\2 #\3}
+
+2)( string-insert (string #\1 #\3 #\5 #\7) #\4 66 )
+{string <CHARS>}
+<SE> =>
+        <STRING> =>
+                   =>{string-insert <STRING> <CHARS> <NUM>}
+                   =>{string-insert {string <CHARS>}  #\4  <DIGIT> <NUM> }
+                   =>{string-insert {string  #\<DIGIT> <CHARS>}  #\4  6<DIGIT>}
+                   =>{string-insert {string  #\1 #\<DIGIT> <CHARS>}  #\4  66}
+                   =>{string-insert {string  #\1 #\3 #\<DIGIT> <CHARS>}  #\4  66}
+                   =>{string-insert {string  #\1 #\3 #\5  #\<DIGIT>}  #\4  66}
+                   =>{string-insert {string  #\1 #\3 #\5  #\7}  #\4  66}
+
+3) ( number->string ( string-length "00" ) )
+<SE> =>
+        <STRING> =>
+                   => {number->string <NUM>}   
+                   => {number->string {string-length <STRING>}}
+                   => {number->string {string-length  "<NUM>"}}
+                   => {number->string {string-length  " <DIGIT> <NUM> "}}
+                   => {number->string {string-length  "0 <DIGIT>"}}
+                   => {number->string {string-length  "00"}}
 
 
 |#
@@ -24,15 +91,22 @@ Task 2:
 We used the instructions in foldl along with map to define a sum of squares function that takes a list of numbers as input,
 and produces a number that is the sum of the squares of all the numbers in the list.
 
-Input:The function receives a list of elements, checks if all elements are numbers or null
-Output :sum of the squares of all the numbers in the list
-Problems we encountered: closing parentheses, due to the fact that only in the first assignment I experimented with this programming language
-In addition, we learned how map and lambda work in racket.
+Input:The function receives a list of elements.
+Output :sum of the squares of all the numbers in the list.
+Problems we encountered:- closing parentheses
+                        - we didn't know the "map" function in racket before, so we had to learn it and understand how it works
+
 Time: 40 minutes
 |#
-(: sum-of-squares : (Listof Number) -> Number);; The function receives a list of elements and checks if all elements are numbers or all elements are null
-(define (sum-of-squares lst) 
-  (foldl + 0 (map (lambda ([num : Number])(* num num )) lst))) ;;All elements that are numbers different from null are squared and added together
+
+;;A helper function that squares each number in the list
+(: square : Number -> Number)
+(define (square x)
+  (* x x))
+
+(: sum-of-squares : (Listof Number) -> Number)
+(define (sum-of-squares list)
+  (foldl + 0 (map square list))) ;;Using the foldl function according to the instructions and calling an auxiliary function and a scheme of all the numbers
 
 (test (sum-of-squares '()) => 0) ;;empty
 (test (sum-of-squares '(3)) => 9)
