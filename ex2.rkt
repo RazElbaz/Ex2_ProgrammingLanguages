@@ -11,29 +11,26 @@ It is also legal to accept expressions of the form "<D>", where <D> represents a
 
 We used λ to denote the empty string.
 Problems we encountered: We had difficulty understanding how to define the SE, we had difficulty defining the STRING according to the examples.
-Time: 5 hours
+Time: a whole day
 
 
  BNF for “SE”:
  
  <SE> ::=  <CHARS> | <NUM> | <STRING> 
- <NUM> ::= <DIGIT> | <DIGIT> <NUM>  | {string-length <STRING>}    ;;Taken from the lecture
- <DIGIT> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9                ;;Taken from the lecture
- <CHARS> ::= #\<DIGIT> | #\<DIGIT> <CHARS> 
+ <NUM> ::= <DIGIT> | <DIGIT> <NUM> | {string-length <STRING>} | λ     ;;Taken from the lecture
+ <DIGIT> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9                    ;;Taken from the lecture
+ <CHARS> ::= #\<DIGIT> | #\<DIGIT> <CHARS> | λ
 
 
  <STRING> ::=
          <NUM>
-         | " <NUM>"  ;;;;;;check;;;;;
-         | λ ;;;;;;check;;;;;
-         | {string-append  λ  λ}  ;;;;;;check;;;;;
-         | STRING ;;;;;;check;;;;;
+         | "<NUM>"                                ;; ( "12344") 
          | {string <CHARS>}                       ;; ( string #\1 #\2 #\4 ) 
          | {string-append <STRING>}               ;; (string-append "45")
          | {string-append <STRING> <STRING>}      ;; (string-append ( string #\1 #\2 #\4 ) "12" ) 
          | {string-append <STRING> <CHARS>}       ;; (string-append "45"  #\4 #\5)
          | {string-insert <STRING> <CHARS> <NUM>} ;; ( string-insert "1357" #\4 66 ) 
-         | {number->string <NUM>}                 ;;( number->string ( string-length "0033344" ) ) 
+         | {number->string <STRING>}              ;; ( number->string ( string-length "0033344" ) ) 
          
          
            
@@ -66,7 +63,7 @@ Time: 4 hours
 <SE> =>
         <STRING> =>
                    =>{string-insert <STRING> <CHARS> <NUM>}
-                   =>{string-insert {string <CHARS>}  #\4  <DIGIT> <NUM> }
+                   =>{string-insert {string <CHARS>}  #\<DIGIT>  <DIGIT><NUM>}
                    =>{string-insert {string  #\<DIGIT> <CHARS>}  #\4  6<DIGIT>}
                    =>{string-insert {string  #\1 #\<DIGIT> <CHARS>}  #\4  66}
                    =>{string-insert {string  #\1 #\3 #\<DIGIT> <CHARS>}  #\4  66}
@@ -79,8 +76,8 @@ Time: 4 hours
                    => {number->string <NUM>}   
                    => {number->string {string-length <STRING>}}
                    => {number->string {string-length  "<NUM>"}}
-                   => {number->string {string-length  " <DIGIT> <NUM> "}}
-                   => {number->string {string-length  "0 <DIGIT>"}}
+                   => {number->string {string-length  " <DIGIT><NUM> "}}
+                   => {number->string {string-length  "0<DIGIT>"}}
                    => {number->string {string-length  "00"}}
 
 
@@ -182,7 +179,7 @@ Time: 10 minutes
 
 
 The grammar:
-  <PLANG> ::=  {{Poly <AEs>} {<AEs}};;;;;;;;;;;check;;;;;;;;;;;;
+  <PLANG> ::=  {poly <AEs>} {<AEs>}
 
  <AEs>   ::=  <AE>
              | <AE> <AEs>
@@ -247,7 +244,12 @@ Time: 60 minutes
 (test (parse "{{poly 1 2} {} }") =error> "parse: at least one point is required in ((poly 1 2) ())")
 (test (parse "{{poly } {}}")=error> "parse: at least one coefficient is required in ((poly) ())")
 (test (parse "{poly Gal Raz 100}") =error> "parse: bad syntax in (poly Gal Raz 100)")
+(test (parse "{{poly {+ 1 2 3} {* 1 2}} {{- 1 2}}}") =error> "parse-sexpr: bad syntax in (+ 1 2 3)")
 (test (parse "{poly}") =error> "parse: bad syntax in (poly)")
+(test(parse "{{} {}}") =error> "parse: bad syntax in (() ())")
+(test(parse "{{} }") =error> "parse: bad syntax in (())")
+(test(parse "{{} {}}") =error> "parse: bad syntax")
+(test(parse "{{} }") =error> "parse: bad syntax")
 
  ;;negative
 (test (parse "{{poly -1 -2 -3} {1 2 3}}")=> (Poly (list (Num -1) (Num -2) (Num -3))(list (Num 1) (Num 2) (Num 3))))
@@ -358,4 +360,6 @@ Explanation of the calculation:
 (test (run "{{poly 1 2} {} }") =error> "parse: at least one point is required in ((poly 1 2) ())")
 (test (run "{{poly } {}}")=error> "parse: at least one coefficient is required in ((poly) ())")
 (test (run "{poly Gal Raz 100}") =error> "parse: bad syntax in (poly Gal Raz 100)")
+
 (test (run "{poly}") =error> "parse: bad syntax in (poly)")
+(test (run "{poly}") =error> "parse: bad syntax")
