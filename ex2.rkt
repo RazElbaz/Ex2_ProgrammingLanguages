@@ -24,13 +24,13 @@ Time: a whole day
 
  <STRING> ::=
          <NUM>
-         | "<NUM>"                                ;; ( "12344") 
-         | {string <CHARS>}                       ;; ( string #\1 #\2 #\4 ) 
+         | "<NUM>"                                ;; ( "12344")
+         | {string <CHARS>}                       ;; (string #\1 #\2 #\4 )
          | {string-append <STRING>}               ;; (string-append "45")
          | {string-append <STRING> <STRING>}      ;; (string-append ( string #\1 #\2 #\4 ) "12" ) 
          | {string-append <STRING> <CHARS>}       ;; (string-append "45"  #\4 #\5)
-         | {string-insert <STRING> <CHARS> <NUM>} ;; ( string-insert "1357" #\4 66 ) 
-         | {number->string <STRING>}              ;; ( number->string ( string-length "0033344" ) ) 
+         | {string-insert <STRING> <CHARS> <NUM>} ;; (string-insert "1357" #\4 66 ) 
+         | {number->string <STRING>}              ;; (number->string ( string-length "0033344" ) ) 
          
          
            
