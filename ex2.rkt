@@ -229,6 +229,7 @@ Time: 60 minutes
   (define (parse str) 
     (let ([code (string->sexpr str)])
       (match code
+        ;;We learned in practice 4 that (list ...) means that there is no limit to the number of members in the list
         [(list (cons 'poly '()) (list rhs ...)) (error 'parse "at least one coefficient is required in ~s" code)] ;;A pattern where the left variable is empty and the right is not
         [(list (cons 'poly lhs) '()) (error 'parse "at least one point is required in ~s" code)] ;;A pattern where the right variable is empty and the left one is not
         [(list (cons 'poly lhs) (list rhs ...)) (Poly (map parse-sexpr lhs) (map parse-sexpr rhs))] ;;A pattern where the right variable and the left variable are not empty
@@ -246,10 +247,11 @@ Time: 60 minutes
 (test (parse "{poly Gal Raz 100}") =error> "parse: bad syntax in (poly Gal Raz 100)")
 (test (parse "{{poly {+ 1 2 3} {* 1 2}} {{- 1 2}}}") =error> "parse-sexpr: bad syntax in (+ 1 2 3)")
 (test (parse "{poly}") =error> "parse: bad syntax in (poly)")
-(test(parse "{{} {}}") =error> "parse: bad syntax in (() ())")
-(test(parse "{{} }") =error> "parse: bad syntax in (())")
-(test(parse "{{} {}}") =error> "parse: bad syntax")
-(test(parse "{{} }") =error> "parse: bad syntax")
+;; null errors
+(test (parse "{{} {}}") =error> "parse: bad syntax in (() ())")
+(test (parse "{{} }") =error> "parse: bad syntax in (())")
+(test (parse "{{} {}}") =error> "parse: bad syntax")
+(test (parse "{{} }") =error> "parse: bad syntax")
 
  ;;negative
 (test (parse "{{poly -1 -2 -3} {1 2 3}}")=> (Poly (list (Num -1) (Num -2) (Num -3))(list (Num 1) (Num 2) (Num 3))))
