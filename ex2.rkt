@@ -179,7 +179,7 @@ Time: 10 minutes
 
 
 The grammar:
-  <PLANG> ::=  {poly <AEs>} {<AEs>}
+  <PLANG> ::=  { {poly <AEs>} {<AEs>} }
 
  <AEs>   ::=  <AE>
              | <AE> <AEs>
